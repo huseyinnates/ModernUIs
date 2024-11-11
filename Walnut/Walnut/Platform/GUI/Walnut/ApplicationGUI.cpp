@@ -857,7 +857,8 @@ namespace Walnut {
 		ImGuiIO& io = ImGui::GetIO();
 
 		// Main loop
-		while (!glfwWindowShouldClose(m_WindowHandle) && m_Running)
+		Counter++;
+		while (!glfwWindowShouldClose(m_WindowHandle) && m_Running && Counter%2==1)
 		{
 			// Poll and handle events (inputs, window resize, etc.)
 			// You can read the io.WantCaptureMouse, io.WantCaptureKeyboard flags to tell if dear imgui wants to use your inputs.

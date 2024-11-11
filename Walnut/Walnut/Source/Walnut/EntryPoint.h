@@ -15,12 +15,17 @@ bool g_ApplicationRunning = true;
 namespace Walnut {
 
 	int Main(int argc, char** argv) {
-
-
-		lve::FirstApp app{};
+		
+		Wallnut::FirstApp app{};
+		Walnut::Application* appUI = Walnut::CreateApplication(argc, argv);
+		appUI->Run();
 
 		try {
-			app.run();
+			while (true) {
+				app.run();
+				appUI->Run();
+			}
+			delete appUI;
 		}
 		catch (const std::exception& e) {
 			std::cerr << e.what() << '\n';
@@ -30,13 +35,12 @@ namespace Walnut {
 		return EXIT_SUCCESS;
 		/*
 		while (g_ApplicationRunning) {
-			Walnut::Application* app = Walnut::CreateApplication(argc, argv);
-			app->Run();
-			delete app;
+			
+			
 		}
 		return 0;
-		
 		*/
+		
 	}
 
 }

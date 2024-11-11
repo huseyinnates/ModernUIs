@@ -48,6 +48,7 @@ namespace Walnut {
 		static Application& Get();
 
 		void Run();
+		int Counter = 0;
 		void SetMenubarCallback(const std::function<void()>& menubarCallback) { m_MenubarCallback = menubarCallback; }
 
 		template<typename T>

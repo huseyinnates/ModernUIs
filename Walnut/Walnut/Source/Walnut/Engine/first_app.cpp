@@ -1,4 +1,4 @@
-#include "first_app.hpp"
+﻿#include "first_app.hpp"
 
 #include "keyboard_movement_controller.hpp"
 #include "lve_buffer.hpp"
@@ -18,25 +18,25 @@
 #include <chrono>
 #include <stdexcept>
 
-namespace lve {
+namespace Wallnut {
 
 FirstApp::FirstApp() {
   globalPool =
-      LveDescriptorPool::Builder(lveDevice)
-          .setMaxSets(LveSwapChain::MAX_FRAMES_IN_FLIGHT)
-          .addPoolSize(VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, LveSwapChain::MAX_FRAMES_IN_FLIGHT)
+      lve::LveDescriptorPool::Builder(lveDevice)
+          .setMaxSets(lve::LveSwapChain::MAX_FRAMES_IN_FLIGHT)
+          .addPoolSize(VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, lve::LveSwapChain::MAX_FRAMES_IN_FLIGHT)
           .build();
   loadGameObjects();
 }
 
-FirstApp::~FirstApp() {}
-
+FirstApp::~FirstApp() {} 
 void FirstApp::run() {
-  std::vector<std::unique_ptr<LveBuffer>> uboBuffers(LveSwapChain::MAX_FRAMES_IN_FLIGHT);
+ 
+  std::vector<std::unique_ptr<lve::LveBuffer>> uboBuffers(lve::LveSwapChain::MAX_FRAMES_IN_FLIGHT);
   for (int i = 0; i < uboBuffers.size(); i++) {
-    uboBuffers[i] = std::make_unique<LveBuffer>(
+    uboBuffers[i] = std::make_unique<lve::LveBuffer>(
         lveDevice,
-        sizeof(GlobalUbo),
+        sizeof(lve::GlobalUbo),
         1,
         VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT,
         VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT);
@@ -44,34 +44,36 @@ void FirstApp::run() {
   }
 
   auto globalSetLayout =
-      LveDescriptorSetLayout::Builder(lveDevice)
+      lve::LveDescriptorSetLayout::Builder(lveDevice)
           .addBinding(0, VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, VK_SHADER_STAGE_ALL_GRAPHICS)
           .build();
 
-  std::vector<VkDescriptorSet> globalDescriptorSets(LveSwapChain::MAX_FRAMES_IN_FLIGHT);
+  std::vector<VkDescriptorSet> globalDescriptorSets(lve::LveSwapChain::MAX_FRAMES_IN_FLIGHT);
   for (int i = 0; i < globalDescriptorSets.size(); i++) {
     auto bufferInfo = uboBuffers[i]->descriptorInfo();
-    LveDescriptorWriter(*globalSetLayout, *globalPool)
+    lve::LveDescriptorWriter(*globalSetLayout, *globalPool)
         .writeBuffer(0, &bufferInfo)
         .build(globalDescriptorSets[i]);
   }
 
-  SimpleRenderSystem simpleRenderSystem{
+  lve::SimpleRenderSystem simpleRenderSystem{
       lveDevice,
       lveRenderer.getSwapChainRenderPass(),
       globalSetLayout->getDescriptorSetLayout()};
-  PointLightSystem pointLightSystem{
+  lve::PointLightSystem pointLightSystem{
       lveDevice,
       lveRenderer.getSwapChainRenderPass(),
       globalSetLayout->getDescriptorSetLayout()};
-  LveCamera camera{};
+  lve::LveCamera camera{};
 
-  auto viewerObject = LveGameObject::createGameObject();
+  auto viewerObject = lve::LveGameObject::createGameObject();
   viewerObject.transform.translation.z = -2.5f;
-  KeyboardMovementController cameraController{};
+  lve::KeyboardMovementController cameraController{};
 
   auto currentTime = std::chrono::high_resolution_clock::now();
-  while (!lveWindow.shouldClose()) {
+
+  Counter++;
+  while (!lveWindow.shouldClose() && Counter%2==0) {
     glfwPollEvents();
 
     auto newTime = std::chrono::high_resolution_clock::now();
@@ -87,7 +89,7 @@ void FirstApp::run() {
 
     if (auto commandBuffer = lveRenderer.beginFrame()) {
       int frameIndex = lveRenderer.getFrameIndex();
-      FrameInfo frameInfo{
+      lve::FrameInfo frameInfo{
           frameIndex,
           frameTime,
           commandBuffer,
@@ -96,7 +98,7 @@ void FirstApp::run() {
           gameObjects};
 
       // update
-      GlobalUbo ubo{};
+      lve::GlobalUbo ubo{};
       ubo.projection = camera.getProjection();
       ubo.view = camera.getView();
       ubo.inverseView = camera.getInverseView();
@@ -116,27 +118,27 @@ void FirstApp::run() {
     }
   }
 
-  vkDeviceWaitIdle(lveDevice.device());
+ // vkDeviceWaitIdle(lveDevice.device());
 }
 
 void FirstApp::loadGameObjects() {
-  std::shared_ptr<LveModel> lveModel =
-      LveModel::createModelFromFile(lveDevice, "C:/Company/C++/UI/Walnut/Walnut/Source/Walnut/models/flat_vase.obj");
-  auto flatVase = LveGameObject::createGameObject();
+  std::shared_ptr<lve::LveModel> lveModel =
+      lve::LveModel::createModelFromFile(lveDevice, "C:/Company/C++/UI/Walnut/Walnut/Source/Walnut/models/flat_vase.obj");
+  auto flatVase = lve::LveGameObject::createGameObject();
   flatVase.model = lveModel;
   flatVase.transform.translation = {-.5f, .5f, 0.f};
   flatVase.transform.scale = {3.f, 1.5f, 3.f};
   gameObjects.emplace(flatVase.getId(), std::move(flatVase));
 
-  lveModel = LveModel::createModelFromFile(lveDevice, "C:/Company/C++/UI/Walnut/Walnut/Source/Walnut/models/flat_vase.obj");
-  auto smoothVase = LveGameObject::createGameObject();
+  lveModel = lve::LveModel::createModelFromFile(lveDevice, "C:/Company/C++/UI/Walnut/Walnut/Source/Walnut/models/flat_vase.obj");
+  auto smoothVase = lve::LveGameObject::createGameObject();
   smoothVase.model = lveModel;
   smoothVase.transform.translation = {.5f, .5f, 0.f};
   smoothVase.transform.scale = {3.f, 1.5f, 3.f};
   gameObjects.emplace(smoothVase.getId(), std::move(smoothVase));
 
-  lveModel = LveModel::createModelFromFile(lveDevice, "C:/Company/C++/UI/Walnut/Walnut/Source/Walnut/models/quad.obj");
-  auto floor = LveGameObject::createGameObject();
+  lveModel = lve::LveModel::createModelFromFile(lveDevice, "C:/Company/C++/UI/Walnut/Walnut/Source/Walnut/models/quad.obj");
+  auto floor = lve::LveGameObject::createGameObject();
   floor.model = lveModel;
   floor.transform.translation = {0.f, .5f, 0.f};
   floor.transform.scale = {3.f, 1.f, 3.f};
@@ -152,7 +154,7 @@ void FirstApp::loadGameObjects() {
   };
 
   for (int i = 0; i < lightColors.size(); i++) {
-    auto pointLight = LveGameObject::makePointLight(0.2f);
+    auto pointLight = lve::LveGameObject::makePointLight(0.2f);
     pointLight.color = lightColors[i];
     auto rotateLight = glm::rotate(
         glm::mat4(1.f),

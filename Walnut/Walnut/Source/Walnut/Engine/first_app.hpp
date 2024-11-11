@@ -10,7 +10,7 @@
 #include <memory>
 #include <vector>
 
-namespace lve {
+namespace Wallnut {
 class FirstApp {
  public:
   static constexpr int WIDTH = 800;
@@ -18,21 +18,20 @@ class FirstApp {
 
   FirstApp();
   ~FirstApp();
-
+  int Counter = 0;
   FirstApp(const FirstApp &) = delete;
-  FirstApp &operator=(const FirstApp &) = delete;
-
+  FirstApp &operator=(const FirstApp &) = delete; 
   void run();
 
  private:
   void loadGameObjects();
 
-  LveWindow lveWindow{WIDTH, HEIGHT, "Vulkan Tutorial"};
-  LveDevice lveDevice{lveWindow};
-  LveRenderer lveRenderer{lveWindow, lveDevice};
+  lve::LveWindow lveWindow{WIDTH, HEIGHT, "Vulkan Tutorial"};
+  lve::LveDevice lveDevice{lveWindow};
+  lve::LveRenderer lveRenderer{lveWindow, lveDevice};
 
   // note: order of declarations matters
-  std::unique_ptr<LveDescriptorPool> globalPool{};
-  LveGameObject::Map gameObjects;
+  std::unique_ptr<lve::LveDescriptorPool> globalPool{};
+  lve::LveGameObject::Map gameObjects;
 };
 }  // namespace lve
